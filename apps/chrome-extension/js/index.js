@@ -16,8 +16,11 @@ const cryptoRatesTable = document.querySelector("#crypto-rates-table");
 CRYTPO_API_URL = "http://localhost:3001";
 CRYPTO_INFO_URL = "./data/currencies.json";
 window.addEventListener("load", async (e) => {
-  const cryptoRates = await fetchCryptoRates();
+  const cryptoRatesInStorage = await getCryptoRates();
   const cryptoInfo = await fetchCryptoInfo();
+  populateTable(cryptoInfo, cryptoRatesInStorage.rates);
+  lastUpdated.innerText = cryptoRatesInStorage.last_updated;
+  const cryptoRates = await fetchCryptoRates();
 
   lastUpdated.innerText = cryptoRates.last_updated;
   populateTable(cryptoInfo, cryptoRates.rates);

@@ -8,8 +8,20 @@
   src: url("assets/fonts/FTSystemTrial-BlankRegular.otf");
 }
 
+* {
+  box-sizing: border-box;
+}
 body {
   font-family: primary, sans-serif;
+  background-color: var(--white);
+  color: var(--black);
+}
+
+a {
+  color: var(--black);
+}
+a:hover {
+  text-decoration: none;
 }
 
 .wrapper {
@@ -17,17 +29,19 @@ body {
   margin: auto;
 }
 .heading {
-  font-size: 6vw;
+  font-size: 102px;
   text-transform: uppercase;
+  white-space: nowrap;
   line-height: 0;
   text-align: center;
   position: relative;
+  width: 100%;
 }
 
 .rocket {
   display: block;
   position: absolute;
-  left: -8%;
+  left: -80px;
   top: 40px;
   font-size: 120px;
 }
@@ -48,18 +62,29 @@ table {
 
 th {
   text-transform: uppercase;
+  margin: 0px;
 }
 
-thead {
-  border: 1px solid var(--black);
-}
 th {
   border-top: 4px solid var(--black);
   border-bottom: 2px solid var(--black);
-  /* border-collapse: collapse; */
   padding: 0.5em 0;
+  border-collapse: collapse;
 }
 
 td {
   padding: 0.5em 0;
+  border-bottom: 1px solid var(--black);
+  border-collapse: collapse;
+}
+
+footer {
+  text-align: center;
+  font-size: 18px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  padding: 2em 0;
+  background: var(--white);
 }
