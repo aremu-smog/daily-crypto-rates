@@ -11,12 +11,45 @@ const timerHour = document.querySelector("#hour");
 const timerMinute = document.querySelector("#minute");
 const lastUpdated = document.querySelector("#last-updated-date");
 
+const cryptoRatesTable = document.querySelector("#crypto-rates-table");
+
 CRYTPO_API_URL = "http://localhost:3001";
+CRYPTO_INFO_URL = "./data/currencies.json";
 window.addEventListener("load", async (e) => {
   const cryptoRates = await fetchCryptoRates();
+  const cryptoInfo = await fetchCryptoInfo();
 
   lastUpdated.innerText = cryptoRates.last_updated;
+  populateTable(cryptoInfo, cryptoRates.rates);
 });
+
+const fetchCryptoInfo = async () => {
+  let cryptoInfo = [];
+  await fetch(CRYPTO_INFO_URL)
+    .then((res) => res.json())
+    .then((data) => {
+      cryptoInfo = data;
+    });
+
+  return cryptoInfo;
+};
+
+const populateTable = (cryptoInfo, cryptoPrices) => {
+  cryptoRatesTable.innerHTML = "";
+  const tableRows = cryptoInfo.map((crypto) => {
+    const { name = "", code = "" } = crypto;
+    const price = cryptoPrices[code];
+
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+			<td>${name}</td>
+			<td>${code.toUpperCase()}</td>
+			<td>$ ${price}</td>
+		`;
+    cryptoRatesTable.append(row);
+  });
+};
 
 const fetchCryptoRates = async () => {
   let cryptoData = {};
