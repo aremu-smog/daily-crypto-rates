@@ -9,7 +9,7 @@ const playButtonLoader = document.querySelector("#play-button-loader");
 
 const timerHour = document.querySelector("#hour");
 const timerMinute = document.querySelector("#minute");
-const lastUpdated = document.querySelector("#last-updated");
+const lastUpdated = document.querySelector("#last-updated-date");
 
 CRYTPO_API_URL = "http://localhost:3001";
 window.addEventListener("load", async (e) => {
