@@ -15,7 +15,14 @@ class CryptoRatesController < ApplicationController
                       key.include?('usdt') && value['ticker']['last'].to_f > 0.0
                     end.transform_values do |value|
                       value['ticker']['last']
-                    end.transform_keys { |key| key.gsub('usdt', '') }
+                    end.transform_keys do |key|
+        new_key = key.gsub('usdt', '')
+        if new_key.include?('usd')
+          'usdt'
+        else
+          new_key
+        end
+      end
       last_updated = Time.now
       render json: { last_updated: last_updated.strftime('%B %d, %Y %I:%M %p'), rates: usdt_prices }
     end
