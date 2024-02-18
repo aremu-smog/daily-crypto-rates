@@ -3,7 +3,7 @@ class CryptoRatesController < ApplicationController
   def index # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
     secret_key = ENV['QUIDAX_SECRET_KEY']
     
-    data = Rails.cache.fetch('daily_crypto_rates', expires_in: 1.minute) do
+    data = Rails.cache.fetch('daily_crypto_rates', expires_in: 1.hour) do
       uri = URI('https://www.quidax.com/api/v1/markets/tickers')
       req = Net::HTTP::Get.new(uri)
       req['Authorization'] = "Bearer #{secret_key}"
