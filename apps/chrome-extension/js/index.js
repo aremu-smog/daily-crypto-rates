@@ -13,7 +13,7 @@ const lastUpdated = document.querySelector("#last-updated-date");
 
 const cryptoRatesTable = document.querySelector("#crypto-rates-table");
 
-CRYTPO_API_URL = "http://localhost:3001";
+CRYTPO_API_URL = "https://daily-crypto-rates.onrender.com";
 CRYPTO_INFO_URL = "./data/currencies.json";
 window.addEventListener("load", async (e) => {
   const cryptoRatesInStorage = await getCryptoRates();
