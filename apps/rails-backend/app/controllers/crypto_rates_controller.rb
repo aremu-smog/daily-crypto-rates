@@ -1,8 +1,9 @@
 class CryptoRatesController < ApplicationController
   require 'net/http'
   def index # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
-    Rails.cache.fetch('daily_crypto_rates', expires_in: 1.hour) do
-      secret_key = ENV['QUIDAX_SECRET_KEY']
+    secret_key = ENV['QUIDAX_SECRET_KEY']
+    
+    data = Rails.cache.fetch('daily_crypto_rates', expires_in: 1.hour) do
       uri = URI('https://www.quidax.com/api/v1/markets/tickers')
       req = Net::HTTP::Get.new(uri)
       req['Authorization'] = "Bearer #{secret_key}"
@@ -24,8 +25,9 @@ class CryptoRatesController < ApplicationController
         end
       end
       last_updated = Time.now
-      render json: { last_updated: last_updated.strftime('%B %d, %Y %I:%M %p'), rates: usdt_prices }
+      { last_updated: last_updated.strftime('%B %d, %Y %I:%M %p'), rates: usdt_prices }
     end
+    render json: data
   rescue StandardError => e
     render json: e
   end
