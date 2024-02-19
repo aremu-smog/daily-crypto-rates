@@ -4,5 +4,7 @@
   { "name": "Tether", "code": "usdt", "description": "", "image": "" },
   { "name": "Binance Coin", "code": "bnb", "description": "", "image": "" },
   { "name": "Solana", "code": "sol", "description": "", "image": "" },
-  { "name": "Ripple", "code": "xrp", "description": "", "image": "" }
+  { "name": "Ripple", "code": "xrp", "description": "", "image": "" },
+  { "name": "Quidax Token", "code": "qdx", "description": "", "image": "" },
+  { "name": "Polkadot", "code": "dot", "description": "", "image": "" }
 ]
