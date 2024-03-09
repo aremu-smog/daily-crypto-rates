@@ -1,34 +1,38 @@
+# frozen_string_literal: true
+
+# CryptoRatesController
 class CryptoRatesController < ApplicationController
-  require 'net/http'
-  def index # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
+  require 'quidax'
+  def index # rubocop:disable Metrics/MethodLength
     secret_key = ENV['QUIDAX_SECRET_KEY']
-    
+    quidax_object = Quidax.new(secret_key)
+
     data = Rails.cache.fetch('daily_crypto_rates', expires_in: 1.hour) do
-      uri = URI('https://www.quidax.com/api/v1/markets/tickers')
-      req = Net::HTTP::Get.new(uri)
-      req['Authorization'] = "Bearer #{secret_key}"
+      all_market_tickers = QuidaxMarkets.get_all_tickers(q_object: quidax_object)
 
-      res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }
+      usdt_prices = transform_market_tickers(all_market_tickers['data'])
 
-      res_body = JSON.parse(res.body)
-      data = res_body['data']
-      usdt_prices = data.filter do |key, value|
-                      key.include?('usdt') && value['ticker']['last'].to_f > 0.0
-                    end.transform_values do |value|
-                      value['ticker']['last']
-                    end.transform_keys do |key|
-        new_key = key.gsub('usdt', '')
-        if new_key.include?('usd')
-          'usdt'
-        else
-          new_key
-        end
-      end
       last_updated = Time.now
       { last_updated: last_updated.strftime('%B %d, %Y %I:%M %p'), rates: usdt_prices }
     end
     render json: data
   rescue StandardError => e
     render json: e
+  end
+
+  private
+
+  def transform_market_tickers(market_tickers)
+    market_tickers.filter do |key, value|
+      key.include?('usdt') && value['ticker']['last'].to_f > 0.0
+    end
+
+    usdt_last_prices = market_tickers.transform_values { |value| value['ticker']['last'] }
+
+    usdt_last_prices.transform_keys do |key|
+      new_key = key.gsub('usdt', '')
+      new_key = 'usdt' if new_key == 'usd'
+      new_key
+    end
   end
 end
