@@ -22,8 +22,12 @@ window.addEventListener("load", async (e) => {
   lastUpdated.innerText = cryptoRatesInStorage.last_updated;
   const cryptoRates = await fetchCryptoRates();
 
-  lastUpdated.innerText = cryptoRates.last_updated;
-  populateTable(cryptoInfo, cryptoRates.rates);
+  const cryptoRatesFromServer = cryptoRates.rates;
+  const hasData = Object.keys(cryptoRatesFromServer).length > 0;
+  if (hasData) {
+    lastUpdated.innerText = cryptoRates.last_updated;
+    populateTable(cryptoInfo, cryptoRates.rates);
+  }
 });
 
 const fetchCryptoInfo = async () => {
@@ -61,8 +65,11 @@ const fetchCryptoRates = async () => {
 
     if (crypto_rates_query.status == 200) {
       data = await crypto_rates_query.json();
-      await setCryptoRates(data);
-      cryptoData = data;
+      const hasData = Object.keys(data.rates).length > 0;
+      if (hasData) {
+        await setCryptoRates(data);
+        cryptoData = data;
+      }
     }
   } catch (e) {
     console.warn("[crypto-api]", e.message);
