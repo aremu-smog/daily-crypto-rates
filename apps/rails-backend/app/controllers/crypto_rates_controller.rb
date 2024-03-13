@@ -4,20 +4,18 @@
 class CryptoRatesController < ApplicationController
   require 'quidax'
   def index # rubocop:disable Metrics/MethodLength
-    secret_key = ENV['QUIDAX_SECRET_KEY']
-    quidax_object = Quidax.new(secret_key)
 
-    data = Rails.cache.fetch('daily_crypto_rates', expires_in: 1.hour) do
-      all_market_tickers = QuidaxMarkets.get_all_tickers(q_object: quidax_object)
+    last_crypto_rate = CryptoRate.last
 
-      usdt_prices = transform_market_tickers(all_market_tickers['data'])
+    return render json: {} if last_crypto_rate.nil?
 
-      last_updated = Time.now
-      { last_updated: last_updated.strftime('%B %d, %Y %I:%M %p'), rates: usdt_prices }
-    end
+    last_updated = last_crypto_rate.created_at
+    rates = JSON.parse(last_crypto_rate.body)
+    data = { last_updated: last_updated, rates: rates }
+
     render json: data
   rescue StandardError => e
-    render json: e
+    puts e.message
   end
 
   private
