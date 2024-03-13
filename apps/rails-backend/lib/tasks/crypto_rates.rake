@@ -5,23 +5,22 @@ namespace :crypto_rates do
   task new: :environment do
     
     puts "=============== Fetch New Crypto Rates ==============="
-    empty_lines
+    empty_lines 2
     secret_key = ENV['QUIDAX_SECRET_KEY']
     quidax_object = Quidax.new(secret_key)
 
     begin
       puts "........... Connecting to API ..........."
       all_market_tickers = QuidaxMarkets.get_all_tickers(q_object: quidax_object)
-      empty_lines
+      empty_lines 2
       
       usdt_prices = transform_market_tickers(all_market_tickers['data'])
       puts "........... Fetched Crypto Rates ..........."
-      empty_lines 4
+      empty_lines 2
 
       new_crypto_rates = CryptoRate.new(body: usdt_prices.to_json)
 
-      puts "✅ New Crypto Rates Saved" if new_crypto_rates.save
-      empty_lines
+      puts "=============== ✅ New Crypto Rates Saved ===============" if new_crypto_rates.save
 
     rescue StandardError => e
       puts "[new-crypto-rates-error] #{e.message}"
