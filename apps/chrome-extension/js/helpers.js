@@ -108,6 +108,21 @@ const getTodaysDate = () => {
   return dateString;
 };
 
+/**
+ *
+ * @param {*} date
+ * @returns {string} date in form: Monday 16 October, 2023
+ */
+const formatDate = (date) => {
+  const dateInstance = new Date(date);
+  const dateString = dateInstance.toLocaleString("en-US", {
+    dateStyle: "full",
+    timeStyle: "long",
+  });
+
+  return dateString;
+};
+
 const MONTHS = [
   "January",
   "February",
