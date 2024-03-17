@@ -16,18 +16,26 @@ const cryptoRatesTable = document.querySelector("#crypto-rates-table");
 CRYTPO_API_URL = "https://daily-crypto-rates.onrender.com";
 CRYPTO_INFO_URL = "./data/currencies.json";
 window.addEventListener("load", async (e) => {
+  let last_updated;
+  let crypto_rates;
   const cryptoRatesInStorage = await getCryptoRates();
   const cryptoInfo = await fetchCryptoInfo();
-  populateTable(cryptoInfo, cryptoRatesInStorage.rates);
-  lastUpdated.innerText = cryptoRatesInStorage.last_updated;
+  last_updated = cryptoRatesInStorage.last_updated;
+  crypto_rates = cryptoRatesInStorage.rates;
+
+  lastUpdated.innerText = formatDate(last_updated);
+  populateTable(cryptoInfo, crypto_rates);
   const cryptoRates = await fetchCryptoRates();
 
   const cryptoRatesFromServer = cryptoRates.rates;
   const hasData = Object.keys(cryptoRatesFromServer).length > 0;
   if (hasData) {
-    lastUpdated.innerText = cryptoRates.last_updated;
-    populateTable(cryptoInfo, cryptoRates.rates);
+    last_updated = cryptoRates.last_updated;
+    crypto_rates = cryptoRates.rates;
   }
+
+  lastUpdated.innerText = formatDate(last_updated);
+  populateTable(cryptoInfo, crypto_rates);
 });
 
 const fetchCryptoInfo = async () => {
