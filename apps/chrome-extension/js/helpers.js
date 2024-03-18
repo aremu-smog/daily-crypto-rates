@@ -40,100 +40,56 @@ const setCryptoRates = (data) => {
  */
 
 const getCryptoRates = async () => {
-  let data;
+  let data = {};
   await chrome.storage.local.get(["crypto-rates"]).then((result) => {
-    data = result["crypto-rates"];
+    const hasResult = Object.keys(result).length > 0;
+    if (hasResult) {
+      data = JSON.parse(result["crypto-rates"]);
+      console.info("[crypto-rates-storage]", "Fetched successfully");
+    }
   });
-  console.log("[crypto-rates-storage]", data);
 
-  return JSON.parse(data);
+  return data;
 };
 
 /**
- *
  * @param {Date} date
- * @returns {number}
- */
-
-const dayOfYear = (date) =>
-  Math.floor(
-    (date - new Date(date.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24)
-  );
-/**
- * @typedef {Object} VerseOfTheDay
- * @property {string} bibleReference
- * @property {string} bibleVerse
- *
- * @returns {VerseOfTheDay}
- */
-const getVerse = async () => {
-  const availableBibleVersions = Object.keys(BIBLE_VERSIONS);
-
-  const currentBibleVersion = availableBibleVersions[0];
-
-  /**
-   * @type {BibleVersion}
-   */
-  const selectedBibleVersion = BIBLE_VERSIONS[currentBibleVersion];
-
-  let bibleVerse;
-  let bibleReference;
-
-  const currentDate = new Date();
-
-  const bibleVerseIndex = dayOfYear(currentDate) - 1;
-  const bibleVersionAbbreviation = selectedBibleVersion.abbreviation;
-
-  const bibleVersionToShow = bibleVersionAbbreviation
-    ? `(${bibleVersionAbbreviation})`
-    : "";
-
-  await fetch(selectedBibleVersion.verses)
-    .then((res) => res.json())
-    .then((data) => {
-      const verseOfTheDay = data[bibleVerseIndex]?.split(" - ");
-      bibleVerse = verseOfTheDay[0];
-      bibleReference = `${verseOfTheDay[1]} ${bibleVersionToShow}`;
-    });
-  return { bibleVerse, bibleReference };
-};
-
-/**
- * Get today's date
- * @returns {string} today's date in form: Monday 16 October, 2023
- */
-const getTodaysDate = () => {
-  const today = new Date();
-  const dateString = today.toDateString();
-  return dateString;
-};
-
-/**
- *
- * @param {*} date
- * @returns {string} date in form: Monday 16 October, 2023
+ * @returns {string} date in form: Monday, March 18, 2024 at 1:01:53 AM GMT+1
  */
 const formatDate = (date) => {
   const dateInstance = new Date(date);
   const dateString = dateInstance.toLocaleString("en-US", {
     dateStyle: "full",
-    timeStyle: "long",
+    timeStyle: "medium",
   });
 
   return dateString;
 };
 
-const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
+/**
+ * @example
+ * // returns 68,233.0
+ * formatAmount('68233.0')
+ * @example
+ * // returns 6823.00
+ * formatAmount('6823.00')
+ *
+ * @param {string} amount
+ * @returns {string}
+ *
+ */
+const formatAmount = (amount) => {
+  const amountSides = amount.split(".");
+  const wholeNumberString = amountSides[0];
+  const decimalNumbers = amountSides[1] ?? "00";
+
+  const formattedWholeNumber = Number(wholeNumberString).toLocaleString();
+
+  const formattedAmount = `${formattedWholeNumber}.${decimalNumbers}`;
+
+  return formattedAmount;
+};
+
+const clearStorage = async () => {
+  await chrome.storage.local.clear();
+};

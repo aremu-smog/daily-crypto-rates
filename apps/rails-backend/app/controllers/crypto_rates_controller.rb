@@ -5,6 +5,7 @@ class CryptoRatesController < ApplicationController
   require 'quidax'
   def index # rubocop:disable Metrics/MethodLength
 
+    Rails.cache.fetch([self, :index]) do
     last_crypto_rate = CryptoRate.last
 
     return render json: {} if last_crypto_rate.nil?
@@ -14,6 +15,7 @@ class CryptoRatesController < ApplicationController
     data = { last_updated: last_updated, rates: rates }
 
     render json: data
+    end
   rescue StandardError => e
     puts e.message
   end
