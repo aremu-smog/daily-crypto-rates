@@ -1,43 +1,27 @@
-const todaysDate = document.querySelector("#todays-date");
-const todaysVerse = document.querySelector("#bible-verse");
-const todaysBibleReference = document.querySelector("#bible-reference");
-
 const mainWrapper = document.querySelector("body");
 
-const playButton = document.querySelector("#play-button");
-const playButtonLoader = document.querySelector("#play-button-loader");
-
-const timerHour = document.querySelector("#hour");
-const timerMinute = document.querySelector("#minute");
 const lastUpdated = document.querySelector("#last-updated-date");
-
 const cryptoRatesTable = document.querySelector("#crypto-rates-table");
 
-CRYTPO_API_URL = "https://daily-crypto-rates.onrender.com";
-CRYPTO_INFO_URL = "./data/currencies.json";
 window.addEventListener("load", async (e) => {
-  let last_updated;
-  let crypto_rates;
   const cryptoRatesInStorage = await getCryptoRates();
-  const cryptoInfo = await fetchCryptoInfo();
-  last_updated = cryptoRatesInStorage.last_updated;
-  crypto_rates = cryptoRatesInStorage.rates;
 
-  lastUpdated.innerText = formatDate(last_updated);
-  populateTable(cryptoInfo, crypto_rates);
-  const cryptoRates = await fetchCryptoRates();
+  await updateDomWithCryptoInfo(cryptoRatesInStorage);
 
-  const cryptoRatesFromServer = cryptoRates.rates;
-  const hasData = Object.keys(cryptoRatesFromServer).length > 0;
-  if (hasData) {
-    last_updated = cryptoRates.last_updated;
-    crypto_rates = cryptoRates.rates;
-  }
+  const cryptoRatesFromServer = await fetchCryptoRates();
 
-  lastUpdated.innerText = formatDate(last_updated);
-  populateTable(cryptoInfo, crypto_rates);
+  await updateDomWithCryptoInfo(cryptoRatesFromServer);
 });
 
+const updateDomWithCryptoInfo = async (data) => {
+  const hasData = Object.keys(data).length > 0;
+  const cryptoInfo = await fetchCryptoInfo();
+
+  if (hasData) {
+    lastUpdated.innerText = formatDate(data.last_updated);
+    populateTable(cryptoInfo, data.rates);
+  }
+};
 const fetchCryptoInfo = async () => {
   let cryptoInfo = [];
   await fetch(CRYPTO_INFO_URL)
@@ -50,6 +34,10 @@ const fetchCryptoInfo = async () => {
 };
 
 const populateTable = (cryptoInfo, cryptoPrices) => {
+  if (!cryptoPrices) {
+    console.warn("[populate-table]", "No crypto prices available");
+    return;
+  }
   cryptoRatesTable.innerHTML = "";
   const tableRows = cryptoInfo.map((crypto) => {
     const { name = "", code = "" } = crypto;
@@ -60,7 +48,7 @@ const populateTable = (cryptoInfo, cryptoPrices) => {
     row.innerHTML = `
 			<td>${name}</td>
 			<td>${code.toUpperCase()}</td>
-			<td>$ ${price}</td>
+			<td>$ ${formatAmount(price)}</td>
 		`;
     cryptoRatesTable.append(row);
   });
@@ -80,18 +68,12 @@ const fetchCryptoRates = async () => {
       }
     }
   } catch (e) {
-    console.warn("[crypto-api]", e.message);
+    console.error("[crypto-rates-api]", e.message);
   } finally {
     cryptoData = await getCryptoRates();
     return cryptoData;
   }
 };
-
-//   window.open(
-//     `https://twitter.com/intent/tweet?text=${text}&via=aremu_smog`,
-//     "popup",
-//     "width=600,height=600"
-//   );
 
 const setTheme = async () => {
   const currentTheme = await getCurrentTheme();
@@ -105,17 +87,4 @@ const setTheme = async () => {
     mainWrapper.classList.remove("dark");
     themeToggleButton.innerText = "Dark Mode";
   }
-};
-
-const displayTime = () => {
-  const now = new Date();
-  const hour = now.getHours();
-  const minute = now.getMinutes();
-
-  const hourString = `${hour}`;
-  const minuteString = `${minute}`;
-
-  timerHour.textContent = hourString.length < 2 ? `0${hourString}` : hourString;
-  timerMinute.textContent =
-    minuteString.length < 2 ? `0${minuteString}` : minuteString;
 };
