@@ -90,6 +90,13 @@ footer {
   background: var(--white);
 }
 
+footer .actions {
+  display: flex;
+  justify-content: center;
+}
+footer .actions .button {
+  min-width: 220px;
+}
 .button {
   background: transparent;
   border: 1px solid var(--black);
@@ -115,6 +122,7 @@ footer {
   bottom: 0;
   transition: height 0.25s ease-in 0s;
   z-index: -1;
+  font-size: 16px !important;
 }
 .button:hover {
   color: var(--white);
@@ -122,7 +130,13 @@ footer {
 .button:hover::after {
   height: 500px;
 }
+button {
+  font-size: 16px;
+}
 
+#tweet-rates {
+  display: none;
+}
 @media screen and (max-width: 1000px) {
   .rocket {
     display: none;

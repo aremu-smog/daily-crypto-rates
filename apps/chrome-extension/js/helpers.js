@@ -93,3 +93,40 @@ const formatAmount = (amount) => {
 const clearStorage = async () => {
   await chrome.storage.local.clear();
 };
+
+const fetchCryptoInfo = async () => {
+  let cryptoInfo = [];
+  await fetch(CRYPTO_INFO_URL)
+    .then((res) => res.json())
+    .then((data) => {
+      cryptoInfo = data;
+    });
+
+  return cryptoInfo;
+};
+
+const newLine = "%0A";
+const tweetRates = async () => {
+  const cryptoInfo = await fetchCryptoInfo();
+  const supportedCrypto = cryptoInfo.filter(
+    (crypto) => crypto["canTweet"] === "true"
+  );
+  const ratesInStorage = await getCryptoRates();
+
+  const { rates, last_updated } = ratesInStorage;
+  let text = "🤖 Daily Crypto Rates";
+  text += newLine;
+  text += formatDate(last_updated);
+  text += newLine;
+  supportedCrypto.forEach((crypto) => {
+    const { code } = crypto;
+    const price = formatAmount(rates[code]);
+    text += `💰 ${code.toUpperCase()} $${price}${newLine}`;
+  });
+
+  window.open(
+    `https://twitter.com/intent/tweet?text=${text}&via=QuidaxGlobal`,
+    "popup",
+    "width=600,height=600"
+  );
+};

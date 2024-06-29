@@ -3,6 +3,8 @@ const mainWrapper = document.querySelector("body");
 const lastUpdated = document.querySelector("#last-updated-date");
 const cryptoRatesTable = document.querySelector("#crypto-rates-table");
 
+const tweetRatesButton = document.querySelector("#tweet-rates");
+
 window.addEventListener("load", async (e) => {
   const cryptoRatesInStorage = await getCryptoRates();
 
@@ -13,24 +15,18 @@ window.addEventListener("load", async (e) => {
   await updateDomWithCryptoInfo(cryptoRatesFromServer);
 });
 
+tweetRatesButton.addEventListener("click", async () => {
+  await tweetRates();
+});
 const updateDomWithCryptoInfo = async (data) => {
   const hasData = Object.keys(data).length > 0;
   const cryptoInfo = await fetchCryptoInfo();
 
   if (hasData) {
+    tweetRatesButton.style.display = "block";
     lastUpdated.innerText = formatDate(data.last_updated);
     populateTable(cryptoInfo, data.rates);
   }
-};
-const fetchCryptoInfo = async () => {
-  let cryptoInfo = [];
-  await fetch(CRYPTO_INFO_URL)
-    .then((res) => res.json())
-    .then((data) => {
-      cryptoInfo = data;
-    });
-
-  return cryptoInfo;
 };
 
 const populateTable = (cryptoInfo, cryptoPrices) => {
